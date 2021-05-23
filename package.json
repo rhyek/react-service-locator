@@ -1,12 +1,13 @@
 {
   "name": "react-service-locator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React implementation of the service locator pattern using Hooks, Context API, and Inversify",
   "author": {
     "name": "Carlos González",
     "email": "carlos.rgn@gmail.com",
     "url": "https://carlosgonzalez.dev"
   },
+  "repository": "github:rhyek/react-service-locator",
   "keywords": [
     "react",
     "inversify",
