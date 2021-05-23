@@ -56,4 +56,55 @@ describe('normal services', () => {
     }
     render(<App />);
   });
+  it('useClass works', () => {
+    function Injecter() {
+      const service = useService<UserService>('token');
+      expect(service instanceof UserService).toBeTruthy();
+      return <div>hello</div>;
+    }
+    function App() {
+      return (
+        <ServiceContainer
+          services={[{ provide: 'token', useClass: UserService }]}
+        >
+          <Injecter />
+        </ServiceContainer>
+      );
+    }
+    render(<App />);
+  });
+  it('useValue works', () => {
+    function Injecter() {
+      const service = useService<UserService>('token');
+      expect(service instanceof UserService).toBeTruthy();
+      return <div>hello</div>;
+    }
+    function App() {
+      return (
+        <ServiceContainer
+          services={[{ provide: 'token', useValue: new UserService() }]}
+        >
+          <Injecter />
+        </ServiceContainer>
+      );
+    }
+    render(<App />);
+  });
+  it('useFactory works', () => {
+    function Injecter() {
+      const service = useService<UserService>('token');
+      expect(service instanceof UserService).toBeTruthy();
+      return <div>hello</div>;
+    }
+    function App() {
+      return (
+        <ServiceContainer
+          services={[{ provide: 'token', useFactory: () => new UserService() }]}
+        >
+          <Injecter />
+        </ServiceContainer>
+      );
+    }
+    render(<App />);
+  });
 });

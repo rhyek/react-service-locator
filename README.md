@@ -4,7 +4,8 @@ An implementation of the [service locator pattern](https://en.wikipedia.org/wiki
 
 ## Features
 
-- Service containers defined via a `ServiceContainer` component that uses `Inversify`'s DI containers under the hood
+- Excellent TypeScript support throughout
+- Service containers defined via a `ServiceContainer` component that uses `Inversify`'s Dependency Injection containers under the hood
 - Support for hierarchical DI using nested `ServiceContainer`s including the capability of overriding services
 - Support for stateful services with reactivity when extending `StatefulService`
 - Services are singletons by default
@@ -83,6 +84,49 @@ export function SignInPage() {
     </button>
   );
 }
+```
+
+## Registering Services
+
+Aside from the default way of registering services shown above, you can also do one of the following:
+
+```ts
+function App() {
+  return (
+    <ServiceContainer services={[
+      SessionService, {/* default */}
+      {
+        provide: 'tokenA', {/* token can be an object, string, or symbol */}
+        useClass: SessionService, {/* same as default */}
+      },
+      {
+        provide: 'tokenB',
+        useValue: someInstance
+      },
+      {
+        provide: someSymbol,
+        useFactory: (context) => new SessionService(context.container.get(ServiceB))
+      }
+    ]}>
+      <Foo />
+    </ServiceContainer>
+  )
+}
+```
+
+## Obtaining services
+
+When registering services in the default way, you can obtain them by simply doing:
+
+```ts
+const service = useService(SessionService);
+```
+
+Sometimes, the service obtained might be of a different type than the provider token depending on how it was registered. Services can be registered with objects, strings, or symbols. To obtain such a service, `useService` allows you to specify a generic type. This will be the compile-time type of the service:
+
+```ts
+// service will be of type SessionService
+const service = useService<SessionService>('tokenA');
 ```
 
 ## Stateful Services
