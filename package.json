@@ -1,6 +1,6 @@
 {
   "name": "react-service-locator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React implementation of the service locator pattern using Hooks, Context API, and Inversify",
   "author": {
     "name": "Carlos González",
