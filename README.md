@@ -4,11 +4,11 @@ An implementation of the [service locator pattern](https://en.wikipedia.org/wiki
 
 ## Features
 
-- Excellent TypeScript support throughout
 - Service containers defined via a `ServiceContainer` component that uses `Inversify`'s Dependency Injection containers under the hood
 - Support for hierarchical DI using nested `ServiceContainer`s including the capability of overriding services
 - Support for stateful services with reactivity when extending `StatefulService`
 - Services are singletons by default
+- Excellent TypeScript support throughout
 
 ## Installation
 
