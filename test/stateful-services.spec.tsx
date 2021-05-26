@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { cleanup, render, fireEvent } from '@testing-library/react';
 import {
   Injectable,
@@ -113,6 +113,43 @@ describe('stateful services', () => {
     }
     const { container } = render(<App />);
     fireEvent.click(container.querySelector('button')!);
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+  it('can do partial state updates', () => {
+    type State = { a: number; b: number };
+    @Injectable()
+    class SessionService extends StatefulService<State> {
+      constructor() {
+        super({ a: 1, b: 2 });
+      }
+      update(values: Partial<State>) {
+        this.setState(values);
+      }
+    }
+    const fn = jest.fn(() => {});
+    function Injecter() {
+      fn();
+      const service = useService(SessionService);
+      const runRef = useRef<number>(0);
+      useEffect(() => {
+        service.update({ b: 3 });
+      }, []);
+      runRef.current++;
+      if (runRef.current === 1) {
+        expect(service.state).toEqual({ a: 1, b: 2 });
+      } else if (runRef.current === 2) {
+        expect(service.state).toEqual({ a: 1, b: 3 });
+      }
+      return <div>hello</div>;
+    }
+    function App() {
+      return (
+        <ServiceContainer services={[SessionService]}>
+          <Injecter />
+        </ServiceContainer>
+      );
+    }
+    render(<App />);
     expect(fn).toHaveBeenCalledTimes(2);
   });
 });

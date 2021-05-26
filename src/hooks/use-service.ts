@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react';
+import { useContext, useRef } from 'react';
 import { interfaces } from 'inversify';
 import { IsStrictlyAny } from '../utils/is-strictly-any';
 import { ServiceLocatorContext } from '../service-locator-context';
@@ -39,7 +39,7 @@ export function useService(token: any, depsFn?: any): any {
   if (!container) {
     throw new Error('No DI container found.');
   }
-  const service: any = useMemo(() => container.get(token), [container, token]);
+  const { current: service } = useRef(container.get(token));
 
   useSetupLifeCycleHooks(service);
   useSetupStatefulService(service, depsFn);

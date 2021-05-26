@@ -10,22 +10,19 @@ An implementation of the [service locator pattern](https://en.wikipedia.org/wiki
 - Services are singletons by default
 - Excellent TypeScript support throughout
 
-## Installation
+## Setup
 
 ```bash
 npm install react-service-locator reflect-metadata
 ```
-
-## Basic Usage
 
 Modify your `tsconfig.json` to enable experimental decorators:
 
 ```json
 {
   "compilerOptions": {
-    ...
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": true
   }
 }
 ```
@@ -35,6 +32,8 @@ Import `reflect-metadata` in your app's entrypoint (for example `index.tsx`):
 ```ts
 import 'reflect-metadata';
 ```
+
+## Basic Usage
 
 Define a service:
 
@@ -114,7 +113,7 @@ function App() {
 }
 ```
 
-## Obtaining services
+## Obtaining Services
 
 When registering services in the default way, you can obtain them by simply doing:
 
@@ -145,7 +144,7 @@ export class SessionService extends StatefulService<{
   private readonly httpService;
 
   constructor() {
-    super(null);
+    super(null); // initialize state
   }
 
   get upperCaseDisplayName() {
@@ -212,7 +211,7 @@ You can return anything as part of that list. Even getters:
 ```ts
 export function Header() {
   const sessionService =
-    useService(SessionService, ({ upperCaseDisplayName }) => [upperCaseDisplayName]);
+    useService(SessionService, (service) => [service.upperCaseDisplayName]);
   ...
 }
 ```

@@ -1,6 +1,6 @@
 {
   "name": "react-service-locator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React implementation of the service locator pattern using Hooks, Context API, and Inversify",
   "author": {
     "name": "Carlos González",
@@ -27,7 +27,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
+    "dev": "tsdx watch",
     "build": "tsdx build",
     "test:types": "tsc -p tsconfig.type-tests.json",
     "test": "npm run test:types && tsdx test --passWithNoTests",
