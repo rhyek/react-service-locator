@@ -32,12 +32,7 @@
     "test:types": "tsc -p tsconfig.type-tests.json",
     "test": "npm run test:types && tsdx test --passWithNoTests",
     "lint": "tsdx lint",
-    "prepare": "tsdx build"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint && npm run test"
-    }
+    "prepare": "husky install && tsdx build"
   },
   "dependencies": {
     "inversify": "^5.1.1"
