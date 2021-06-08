@@ -97,15 +97,15 @@ function App() {
       {
         provide: 'tokenA', {/* token can be an object, string, or symbol */}
         useClass: SessionService, {/* same as default */},
+      },
+      {
+        provide: someSymbol,
+        useFactory: (context) => new SessionService(context.container.get(ServiceB)),
         scope: 'transient',
       },
       {
         provide: 'tokenB',
-        useValue: someInstance
-      },
-      {
-        provide: someSymbol,
-        useFactory: (context) => new SessionService(context.container.get(ServiceB))
+        useValue: someInstance,
       }
     ]}>
       <Foo />
