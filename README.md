@@ -92,31 +92,36 @@ Aside from the default way of registering services shown above, you can also do 
 ```ts
 function App() {
   return (
-    <ServiceContainer services={[
-      SessionService, {/* default */}
-      {
-        provide: 'tokenA', {/* token can be an object, string, or symbol */}
-        useClass: SessionService, {/* same as default */},
-      },
-      {
-        provide: someSymbol,
-        useFactory: (context) => new SessionService(context.container.get(ServiceB)),
-        scope: 'transient',
-      },
-      {
-        provide: 'tokenB',
-        useValue: someInstance,
-      }
-    ]}>
+    <ServiceContainer
+      services={[
+        SessionService, // shorthand
+        {
+          // same as shorthand
+          provide: SessionService,
+          useClass: SessionService,
+          scope: 'singleton', // optional
+        },
+        {
+          provide: someSymbol, // token can be an object, string, or symbol
+          useFactory: (context) =>
+            new SessionService(context.container.get(ServiceB)),
+          scope: 'transient',
+        },
+        {
+          provide: 'tokenB',
+          useValue: someInstance,
+        },
+      ]}
+    >
       <Foo />
     </ServiceContainer>
-  )
+  );
 }
 ```
 
 ### Scopes
 
-All forms of service registration are singleton-scoped by default. `useClass` and `useFactory` forms support a `scope` option that can be set to either `singleton` or `transient`.
+All forms of service registration are singleton-scoped by default. `useClass` and `useFactory` forms support a `scope` option that can be set to either `singleton` or `transient`. Shorthand and `useValue` forms will always be singleton-scoped.
 
 ## Obtaining Services
 
