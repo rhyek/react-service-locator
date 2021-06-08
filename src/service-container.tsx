@@ -8,13 +8,24 @@ function createContainer() {
   });
 }
 
+type Scope = 'singleton' | 'transient';
+
 type Provider =
   | (new (...args: any[]) => any)
   | {
       provide: interfaces.ServiceIdentifier<any>;
-      useClass?: new (...args: any[]) => any;
-      useValue?: any;
-      useFactory?: (context: interfaces.Context) => any;
+      useClass: new (...args: any[]) => any;
+      scope?: Scope;
+    }
+  | {
+      provide: interfaces.ServiceIdentifier<any>;
+      useFactory: (context: interfaces.Context) => any;
+      scope?: Scope;
+    }
+  | {
+      provide: interfaces.ServiceIdentifier<any>;
+      useValue: any;
+      scope?: never;
     };
 
 interface ServiceLocatorProviderProps {
@@ -35,13 +46,25 @@ export const ServiceContainer: React.FC<ServiceLocatorProviderProps> = ({
       if (typeof provider === 'function') {
         container.bind(provider).to(provider).inSingletonScope();
       } else {
-        const { provide, useClass, useValue, useFactory } = provider;
-        if (useClass) {
-          container.bind(provide).to(useClass).inSingletonScope();
-        } else if (useValue) {
-          container.bind(provide).toConstantValue(useValue);
-        } else if (useFactory) {
-          container.bind(provide).toDynamicValue(useFactory);
+        const { provide } = provider;
+        let scope: Scope = 'singleton';
+        if ('scope' in provider && provider.scope) {
+          scope = provider.scope;
+        }
+        if ('useClass' in provider && provider.useClass) {
+          const binding = container.bind(provide).to(provider.useClass);
+          if (scope === 'singleton') {
+            binding.inSingletonScope();
+          }
+        } else if ('useFactory' in provider && provider.useFactory) {
+          const binding = container
+            .bind(provide)
+            .toDynamicValue(provider.useFactory);
+          if (scope === 'singleton') {
+            binding.inSingletonScope();
+          }
+        } else if ('useValue' in provider && provider.useValue) {
+          container.bind(provide).toConstantValue(provider.useValue);
         } else {
           throw new Error('Unable to determine how to register provider.');
         }

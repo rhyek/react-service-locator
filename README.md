@@ -7,7 +7,7 @@ An implementation of the [service locator pattern](https://en.wikipedia.org/wiki
 - Service containers defined via a `ServiceContainer` component that uses `Inversify`'s Dependency Injection containers under the hood
 - Support for hierarchical DI using nested `ServiceContainer`s including the capability of overriding services
 - Support for stateful services with reactivity when extending `StatefulService`
-- Services are singletons by default
+- Services are singleton-scoped by default, but transient is supported for `useClass` and `useFactory`
 - Excellent TypeScript support throughout
 
 ## Setup
@@ -96,7 +96,8 @@ function App() {
       SessionService, {/* default */}
       {
         provide: 'tokenA', {/* token can be an object, string, or symbol */}
-        useClass: SessionService, {/* same as default */}
+        useClass: SessionService, {/* same as default */},
+        scope: 'transient',
       },
       {
         provide: 'tokenB',
@@ -112,6 +113,10 @@ function App() {
   )
 }
 ```
+
+### Scopes
+
+All forms of service registration are singleton-scoped by default. `useClass` and `useFactory` forms support a `scope` option that can be set to either `singleton` or `transient`.
 
 ## Obtaining Services
 
@@ -220,6 +225,6 @@ export function Header() {
 
 - **Service locator? Isn't this dependency injection?**
 
-  Although they are very similar, there is a slight difference between the two. With the service locator pattern, your code is responsible for explicitly obtaining the service through a known mechanism or utility. In our case we are using the `useService` hook as our serivce locator.
+  Although they are very similar, there is a slight difference between the two. With the service locator pattern, your code is responsible for explicitly obtaining the service through a known mechanism or utility. In our case we are using the `useService` hook as our service locator.
 
   More answers to the difference between the two [here](https://stackoverflow.com/questions/1557781/whats-the-difference-between-the-dependency-injection-and-service-locator-patte).
