@@ -25,11 +25,11 @@ export function useSetupStatefulService(
         forceUpdate();
       }
     };
-    service.addListener(listenerRef.current);
   }
 
   useEffect(() => {
-    if (service instanceof StatefulService) {
+    if (service instanceof StatefulService && listenerRef.current !== null) {
+      service.addListener(listenerRef.current);
       return () => {
         if (listenerRef.current !== null) {
           service.removeListener(listenerRef.current);
