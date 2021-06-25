@@ -1,12 +1,18 @@
 import 'reflect-metadata';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { cleanup, render, fireEvent } from '@testing-library/react';
 import {
   Injectable,
   ServiceContainer,
   StatefulService,
   useService,
+  useServiceSelector,
 } from '../src';
+
+@Injectable()
+class SimpleService {
+  hi = () => {};
+}
 
 @Injectable()
 class ProductService extends StatefulService<{ products: string[] }> {
@@ -14,9 +20,9 @@ class ProductService extends StatefulService<{ products: string[] }> {
     super({ products: ['a'] });
   }
 
-  addProduct(name: string) {
+  addProduct = (name: string) => {
     this.setState({ products: [...this.state.products, name] });
-  }
+  };
 
   get first() {
     return this.state.products[0];
@@ -27,7 +33,7 @@ class ProductService extends StatefulService<{ products: string[] }> {
   }
 }
 
-describe('stateful services', () => {
+describe('selector', () => {
   afterEach(() => {
     cleanup();
   });
@@ -36,7 +42,7 @@ describe('stateful services', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const productService = useService(ProductService);
+      const add = useServiceSelector(ProductService, (s) => s.addProduct);
       return <div>hello</div>;
     }
     function App() {
@@ -49,36 +55,33 @@ describe('stateful services', () => {
     render(<App />);
     expect(fn).toHaveBeenCalledTimes(1);
   });
-  it('injecter re-renders once when state is changed and no deps are specified', () => {
+  it('can use a non-stateful service', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const productService = useService(ProductService);
-      return (
-        <div>
-          <button onClick={() => productService.addProduct('b')}>add</button>
-        </div>
-      );
+      const hi = useServiceSelector(SimpleService, (s) => s.hi);
+      return <div>hello</div>;
     }
     function App() {
       return (
-        <ServiceContainer services={[ProductService]}>
+        <ServiceContainer services={[SimpleService]}>
           <Injecter />
         </ServiceContainer>
       );
     }
-    const { container } = render(<App />);
-    fireEvent.click(container.querySelector('button')!);
-    expect(fn).toHaveBeenCalledTimes(2);
+    render(<App />);
+    expect(fn).toHaveBeenCalledTimes(1);
   });
-  it('injecter does not re-render if deps are not affected', () => {
+  it('injecter does not re-render if state changes but selector result does not', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const productService = useService(ProductService, ({ first }) => [first]);
+      const { add } = useServiceSelector(ProductService, (s) => ({
+        add: s.addProduct,
+      }));
       return (
         <div>
-          <button onClick={() => productService.addProduct('b')}>add</button>
+          <button onClick={() => add('b')}>add</button>
         </div>
       );
     }
@@ -93,14 +96,17 @@ describe('stateful services', () => {
     fireEvent.click(container.querySelector('button')!);
     expect(fn).toHaveBeenCalledTimes(1);
   });
-  it('injecter re-renders if deps are affected', () => {
+  it('injecter does re-render if state changes and selector result does, too', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const productService = useService(ProductService, ({ count }) => [count]);
+      const { add } = useServiceSelector(ProductService, (s) => ({
+        products: s.state.products,
+        add: s.addProduct,
+      }));
       return (
         <div>
-          <button onClick={() => productService.addProduct('b')}></button>
+          <button onClick={() => add('b')}>add</button>
         </div>
       );
     }
@@ -115,41 +121,33 @@ describe('stateful services', () => {
     fireEvent.click(container.querySelector('button')!);
     expect(fn).toHaveBeenCalledTimes(2);
   });
-  it('can do partial state updates', () => {
-    type State = { a: number; b: number };
-    @Injectable()
-    class SessionService extends StatefulService<State> {
-      constructor() {
-        super({ a: 1, b: 2 });
-      }
-      update(values: Partial<State>) {
-        this.setState(values);
-      }
-    }
+  it('injecter re-renders if state changes and primitive selector result changes', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const service = useService(SessionService);
-      const runRef = useRef<number>(0);
-      useEffect(() => {
-        service.update({ b: 3 });
-      }, []);
-      runRef.current++;
-      if (runRef.current === 1) {
-        expect(service.state).toEqual({ a: 1, b: 2 });
-      } else if (runRef.current === 2) {
-        expect(service.state).toEqual({ a: 1, b: 3 });
-      }
-      return <div>hello</div>;
+      const { addProduct } = useService(ProductService, () => []);
+      const length = useServiceSelector(
+        ProductService,
+        (s) => s.state.products.length
+      );
+      return (
+        <div>
+          length: {length}
+          <button onClick={() => addProduct('b')}>add</button>
+        </div>
+      );
     }
     function App() {
       return (
-        <ServiceContainer services={[SessionService]}>
+        <ServiceContainer services={[ProductService]}>
           <Injecter />
         </ServiceContainer>
       );
     }
-    render(<App />);
+    const { container, getByText } = render(<App />);
+    expect(getByText('length: 1')).toBeTruthy();
+    fireEvent.click(container.querySelector('button')!);
     expect(fn).toHaveBeenCalledTimes(2);
+    expect(getByText('length: 2')).toBeTruthy();
   });
 });

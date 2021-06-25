@@ -46,9 +46,9 @@ export class SessionService {
   @Inject(HttpService)
   private readonly httpService;
 
-  public async login(username: string, password: string): Promise<void> {
+  public login = async (username: string, password: string): Promise<void> => {
     await this.httpService.post('/login', { username, password });
-  }
+  };
 }
 ```
 
@@ -125,18 +125,32 @@ All forms of service registration are singleton-scoped by default. `useClass` an
 
 ## Obtaining Services
 
-When registering services in the default way, you can obtain them by simply doing:
+### `useService` hook
+
+When registering services in the default way, you can obtain the service instance by simply doing:
 
 ```ts
 const service = useService(SessionService);
 ```
 
-Sometimes, the service obtained might be of a different type than the provider token depending on how it was registered. Services can be registered with objects, strings, or symbols. To obtain such a service, `useService` allows you to specify a generic type. This will be the compile-time type of the service:
+You can also explicitly specify the return type:
 
 ```ts
 // service will be of type SessionService
 const service = useService<SessionService>('tokenA');
 ```
+
+### `useServiceSelector` hook
+
+You can use this hook to obtain a partial or transformed representation of the service instance:
+
+```ts
+const { fn } = useServiceSelector(SessionService, (service) => ({
+  fn: service.login,
+}));
+```
+
+> This hook is most useful with Stateful Services.
 
 ## Stateful Services
 
@@ -179,52 +193,39 @@ export class SessionService extends StatefulService<{
 }
 ```
 
-Now we can have a component that reads that state. This component will be re-rendered everytime `this.setState` is called on `SessionService`:
+### Stateful Services and `useService` hook
 
-```ts
-import { useService } from 'react-service-locator';
-...
+When using `useService` to obtain a stateful service instance, every time `this.setState` is called within that service, `useService` will trigger a re-render on any component where it is used.
 
-export function Header() {
-  const sessionService = useService(SessionService);
-
-  return (
-    <div>
-      <span>Name:</span>
-      {sessionService.state?.displayName ?? 'Sign in, please'}
-    </div>
-  );
-}
-```
-
-> _Note:_ The public `state` property is a getter that returns a recursively immutable version of the service's internal state.
-
-### Avoiding unnecessary re-renders
-
-Some services like `SessionService` might have complex objects as their state and components might care about _some_ of the data and re-render whenever it changes, but for performance reasons we want to avoid re-renders for the rest.
-
-For example, our `Header` component is only using `displayName`, but not `idle`. We can ignore changes to `idle` by doing the following:
+We can avoid unnecessary re-renders by providing a second parameter (`depsFn`) to `useService`:
 
 ```ts
 export function Header() {
   const sessionService =
     useService(SessionService, (service) => [service.state.displayName]);
-    // service's type is known
   ...
 }
 ```
 
-The second parameter is an optional callback that receives the service instance as the parameter and must return a dependencies list similar to what you provide to React's `useEffect` and other built-in hooks. This dependencies list is shallow compared to the previous value after the last time `this.setState` was called.
+Now, re-renders will only happen in the `Header` component whenever `state.displayName` changes in our service. Any other change to state will be ignored.
 
-You can return anything as part of that list. Even getters:
+`depsFn` receives the entire service instance so that you have more control. The function must return a dependencies list similar to what you provide to React's `useEffect` and other built-in hooks. This dependencies list is shallow compared every time `this.setState` is called.
+
+### Stateful Services and `useServiceSelector` hook
+
+Another way to obtain a stateful service besides `useService` is with `useServiceSelector`. This hook will behave the same way as when called with non stateful services, but additionally it will trigger a re-render whenever `this.setState` is called and if and only if the result of `selectorFn` has changed.
 
 ```ts
-export function Header() {
-  const sessionService =
-    useService(SessionService, (service) => [service.upperCaseDisplayName]);
-  ...
-}
+const { name } = useServiceSelector(SessionService, (service) => ({
+  name: service.state.displayName,
+}));
 ```
+
+#### Compare function
+
+If `selectorFn`'s result is a primitive value it will be compared with `Object.is`. If it is either an object or array, a shallow comparison will used.
+
+You can provide a compare function as an optional third parameter if needed.
 
 ## FAQ
 

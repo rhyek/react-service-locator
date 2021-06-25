@@ -1,4 +1,4 @@
-import { Immutable } from './utils/immutable';
+import { Immutable } from './types/immutable';
 
 interface StatefulServiceListener {
   (): void;

@@ -1,7 +1,7 @@
 import { interfaces } from 'inversify';
 import { useService } from '../hooks/use-service';
 import { StatefulService } from '../stateful-service';
-import { IsStrictlyAny } from './is-strictly-any';
+import { IsStrictlyAny } from '../types/is-strictly-any';
 
 export function createStatefulServiceHookAlias<
   ExplicitProvider extends StatefulService<any> = any,

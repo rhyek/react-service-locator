@@ -1,6 +1,6 @@
 import { expectTypeOf } from 'expect-type';
 import { StatefulService } from '../stateful-service';
-import { Immutable } from '../utils/immutable';
+import { Immutable } from '../types/immutable';
 import { useService } from './use-service';
 
 class RoleService {
