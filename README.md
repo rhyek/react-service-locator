@@ -35,6 +35,21 @@ import 'reflect-metadata';
 
 ## Basic Usage
 
+Place a `<ServiceContainer>` in the component tree:
+
+```tsx
+import { ServiceContainer } from 'react-service-locator';
+...
+
+function App() {
+  return (
+    <ServiceContainer>
+      <SignInPage />
+    </ServiceContainer>
+  );
+}
+```
+
 Define a service:
 
 ```ts
@@ -49,21 +64,6 @@ export class SessionService {
   public login = async (username: string, password: string): Promise<void> => {
     await this.httpService.post('/login', { username, password });
   };
-}
-```
-
-Register the service in the service container:
-
-```tsx
-import { ServiceContainer } from 'react-service-locator';
-...
-
-function App() {
-  return (
-    <ServiceContainer services={[HttpService, SessionService]}>
-      <SignInPage />
-    </ServiceContainer>
-  );
 }
 ```
 
@@ -87,7 +87,23 @@ export function SignInPage() {
 
 ## Registering Services
 
-Aside from the default way of registering services shown above, you can also do one of the following:
+### Using the `Injectable` decorator
+
+By default, all classes decorated with `@Injectable` are automatically registered in the service container. The decorator receives two optional parameters: `token` and `scope`. If not specified, `token` will be the target class and `scope` will be `singleton`:
+
+```ts
+@Injectable()
+class HttpService {}
+```
+
+is equivalent to:
+
+```ts
+@Injectable(HttpService, 'singleton')
+class HttpService {}
+```
+
+For more control, you can also register services on the `<ServiceContainer>`:
 
 ```ts
 function App() {
@@ -118,6 +134,8 @@ function App() {
   );
 }
 ```
+
+> Note: Services registered on the `<ServiceContainer>` will override those registered with just the decorator if they have the same token.
 
 ### Scopes
 

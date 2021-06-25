@@ -1,4 +1,5 @@
-export { inject as Inject, injectable as Injectable } from 'inversify';
+export { inject as Inject } from 'inversify';
+export { Injectable } from './decorators/injectable';
 export { useService } from './hooks/use-service';
 export { useServiceSelector } from './hooks/use-service-selector';
 export { createStatefulServiceHookAlias } from './utils/create-stateful-service-hook-alias';

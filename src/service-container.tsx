@@ -1,6 +1,9 @@
 import React, { useContext, useMemo } from 'react';
 import { Container, interfaces } from 'inversify';
 import { ServiceLocatorContext } from './service-locator-context';
+import { Scope } from './types/scope';
+import { defaultServices } from './default-services';
+import { Constructor } from './types/constructor';
 
 function createContainer() {
   return new Container({
@@ -8,10 +11,8 @@ function createContainer() {
   });
 }
 
-type Scope = 'singleton' | 'transient';
-
 type Provider =
-  | (new (...args: any[]) => any)
+  | Constructor
   | {
       provide: interfaces.ServiceIdentifier<any>;
       useClass: new (...args: any[]) => any;
@@ -29,11 +30,11 @@ type Provider =
     };
 
 interface ServiceLocatorProviderProps {
-  services: Provider[];
+  services?: Provider[];
 }
 
 export const ServiceContainer: React.FC<ServiceLocatorProviderProps> = ({
-  services,
+  services = [],
   children,
 }) => {
   const parentContainer = useContext(ServiceLocatorContext);
@@ -42,32 +43,53 @@ export const ServiceContainer: React.FC<ServiceLocatorProviderProps> = ({
     const container = parentContainer
       ? parentContainer.createChild()
       : createContainer();
-    for (const provider of services) {
+    const finalServices = services.slice();
+    for (const [token, { cls, scope }] of Array.from(
+      defaultServices.entries()
+    )) {
+      finalServices.unshift({
+        provide: token,
+        useClass: cls,
+        scope,
+      });
+    }
+    const doneTokens: any[] = [];
+    for (const provider of finalServices.reverse()) {
+      let finalProvider: Exclude<Provider, Constructor>;
       if (typeof provider === 'function') {
-        container.bind(provider).to(provider).inSingletonScope();
+        finalProvider = {
+          provide: provider as Constructor,
+          useClass: provider as Constructor,
+          scope: 'singleton',
+        };
       } else {
-        const { provide } = provider;
-        let scope: Scope = 'singleton';
-        if ('scope' in provider && provider.scope) {
-          scope = provider.scope;
+        finalProvider = provider;
+      }
+      const { provide } = finalProvider;
+      if (doneTokens.includes(provide)) {
+        continue;
+      }
+      doneTokens.push(provide);
+      let scope: Scope = 'singleton';
+      if ('scope' in finalProvider && finalProvider.scope) {
+        scope = finalProvider.scope;
+      }
+      if ('useClass' in finalProvider && finalProvider.useClass) {
+        const binding = container.bind(provide).to(finalProvider.useClass);
+        if (scope === 'singleton') {
+          binding.inSingletonScope();
         }
-        if ('useClass' in provider && provider.useClass) {
-          const binding = container.bind(provide).to(provider.useClass);
-          if (scope === 'singleton') {
-            binding.inSingletonScope();
-          }
-        } else if ('useFactory' in provider && provider.useFactory) {
-          const binding = container
-            .bind(provide)
-            .toDynamicValue(provider.useFactory);
-          if (scope === 'singleton') {
-            binding.inSingletonScope();
-          }
-        } else if ('useValue' in provider && provider.useValue) {
-          container.bind(provide).toConstantValue(provider.useValue);
-        } else {
-          throw new Error('Unable to determine how to register provider.');
+      } else if ('useFactory' in finalProvider && finalProvider.useFactory) {
+        const binding = container
+          .bind(provide)
+          .toDynamicValue(finalProvider.useFactory);
+        if (scope === 'singleton') {
+          binding.inSingletonScope();
         }
+      } else if ('useValue' in finalProvider && finalProvider.useValue) {
+        container.bind(provide).toConstantValue(finalProvider.useValue);
+      } else {
+        throw new Error('Unable to determine how to register provider.');
       }
     }
     return container;
