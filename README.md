@@ -227,6 +227,12 @@ If `selectorFn`'s result is a primitive value it will be compared with `Object.i
 
 You can provide a compare function as an optional third parameter if needed.
 
+### Why one or the other?
+
+The main difference between `useService` and `useServiceSelector` is that the former will always return the entire service instance, while the latter will only return the exact result of its `selectorFn`. This means that with `useService` the `depsFn` can define a set of dependencies for re-renders while still giving you access to everything the service exposes. This can be good in some cases, but it can potentially lead to situations where in your component you access some state that you forget to add to the dependency list which could result in stale UI elements.
+
+With `useServiceSelector` you are forced to add everything you need in your component to the `selectorFn` result, so it's easier to reason about.
+
 ## FAQ
 
 - **Service locator? Isn't this dependency injection?**
