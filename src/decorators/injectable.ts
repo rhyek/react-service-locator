@@ -3,10 +3,15 @@ import { defaultServices } from '../default-services';
 import { Constructor } from '../types/constructor';
 import { Scope } from '../types/scope';
 
-export const Injectable: (
-  token?: interfaces.ServiceIdentifier<any>,
-  scope?: Scope
-) => ClassDecorator = (token, scope = 'singleton') => {
+type InjectableOptions = {
+  token?: interfaces.ServiceIdentifier<any>;
+  scope?: Scope;
+};
+
+export const Injectable: (options?: InjectableOptions) => ClassDecorator = (
+  options = {}
+) => {
+  let { token, scope = 'singleton' } = options;
   return (constructor: Function) => {
     if (typeof token === 'undefined') {
       token = constructor;

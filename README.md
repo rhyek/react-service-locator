@@ -241,9 +241,9 @@ const { name } = useServiceSelector(SessionService, (service) => ({
 
 #### Compare function
 
-If `selectorFn`'s result is a primitive value it will be compared with `Object.is`. If it is either an object or array, a shallow comparison will used.
+If `selectorFn`'s result is a primitive value it will be compared with `Object.is`. If it is either an object or array, a shallow comparison will be used.
 
-You can provide a compare function as an optional third parameter if needed.
+You can provide an alternative compare function as an optional third parameter, if needed.
 
 ### Why one or the other?
 

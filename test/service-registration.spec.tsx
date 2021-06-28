@@ -50,7 +50,7 @@ describe('service registration', () => {
   });
 
   it('with decorator specifying string token', () => {
-    @Injectable('token')
+    @Injectable({ token: 'token' })
     class UserService {}
 
     function Injecter() {
@@ -70,7 +70,7 @@ describe('service registration', () => {
   });
 
   it('with decorator specifying same class as token', () => {
-    @Injectable(UserService)
+    @Injectable({ token: UserService })
     class UserService {}
 
     function Injecter() {
