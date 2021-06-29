@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import React from 'react';
+import React, { memo } from 'react';
 import { cleanup, render, fireEvent } from '@testing-library/react';
 import {
   Injectable,
@@ -15,22 +15,22 @@ class SimpleService {
 }
 
 @Injectable()
-class ProductService extends StatefulService<{ products: string[] }> {
+class VisibilityService extends StatefulService<{ visible: boolean }> {
   constructor() {
-    super({ products: ['a'] });
+    super({ visible: false });
   }
 
-  addProduct = (name: string) => {
-    this.setState({ products: [...this.state.products, name] });
+  toggle = () => {
+    this.setState({
+      visible: !this.state.visible,
+    });
   };
 
-  get first() {
-    return this.state.products[0];
-  }
-
-  get count() {
-    return this.state.products.length;
-  }
+  hide = () => {
+    this.setState({
+      visible: false,
+    });
+  };
 }
 
 describe('selector', () => {
@@ -42,12 +42,12 @@ describe('selector', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const add = useServiceSelector(ProductService, (s) => s.addProduct);
+      const toggle = useServiceSelector(VisibilityService, (s) => s.toggle);
       return <div>hello</div>;
     }
     function App() {
       return (
-        <ServiceContainer services={[ProductService]}>
+        <ServiceContainer services={[VisibilityService]}>
           <Injecter />
         </ServiceContainer>
       );
@@ -76,18 +76,18 @@ describe('selector', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const { add } = useServiceSelector(ProductService, (s) => ({
-        add: s.addProduct,
+      const { toggle } = useServiceSelector(VisibilityService, (s) => ({
+        toggle: s.toggle,
       }));
       return (
         <div>
-          <button onClick={() => add('b')}>add</button>
+          <button onClick={() => toggle()}></button>
         </div>
       );
     }
     function App() {
       return (
-        <ServiceContainer services={[ProductService]}>
+        <ServiceContainer services={[VisibilityService]}>
           <Injecter />
         </ServiceContainer>
       );
@@ -100,19 +100,19 @@ describe('selector', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const { add } = useServiceSelector(ProductService, (s) => ({
-        products: s.state.products,
-        add: s.addProduct,
+      const { toggle } = useServiceSelector(VisibilityService, (s) => ({
+        visible: s.state.visible,
+        toggle: s.toggle,
       }));
       return (
         <div>
-          <button onClick={() => add('b')}>add</button>
+          <button onClick={() => toggle()}></button>
         </div>
       );
     }
     function App() {
       return (
-        <ServiceContainer services={[ProductService]}>
+        <ServiceContainer services={[VisibilityService]}>
           <Injecter />
         </ServiceContainer>
       );
@@ -125,29 +125,80 @@ describe('selector', () => {
     const fn = jest.fn(() => {});
     function Injecter() {
       fn();
-      const { addProduct } = useService(ProductService, () => []);
-      const length = useServiceSelector(
-        ProductService,
-        (s) => s.state.products.length
+      const { toggle } = useService(VisibilityService, () => []);
+      const visible = useServiceSelector(
+        VisibilityService,
+        (s) => s.state.visible
       );
       return (
         <div>
-          length: {length}
-          <button onClick={() => addProduct('b')}>add</button>
+          visible: {visible ? 'yes' : 'no'}
+          <button onClick={() => toggle()}>add</button>
         </div>
       );
     }
     function App() {
       return (
-        <ServiceContainer services={[ProductService]}>
+        <ServiceContainer services={[VisibilityService]}>
           <Injecter />
         </ServiceContainer>
       );
     }
     const { container, getByText } = render(<App />);
-    expect(getByText('length: 1')).toBeTruthy();
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(getByText('visible: no')).toBeTruthy();
     fireEvent.click(container.querySelector('button')!);
     expect(fn).toHaveBeenCalledTimes(2);
-    expect(getByText('length: 2')).toBeTruthy();
+    expect(getByText('visible: yes')).toBeTruthy();
+  });
+  it('complex test', () => {
+    const fn1 = jest.fn(() => {});
+    const Injecter1 = memo(() => {
+      fn1();
+      const { visible } = useServiceSelector(VisibilityService, (s) => ({
+        visible: s.state.visible,
+      }));
+      return <div>visible1: {visible ? 'yes' : 'no'}</div>;
+    });
+    const fn2 = jest.fn(() => {});
+    const Injecter2 = memo(() => {
+      fn2();
+      const { toggle } = useService(VisibilityService, () => []);
+      const { visible } = useServiceSelector(VisibilityService, (s) => ({
+        visible: s.state.visible,
+      }));
+      return (
+        <div>
+          visible2: {visible ? 'yes' : 'no'}
+          <button onClick={() => toggle()}></button>
+        </div>
+      );
+    });
+    function App() {
+      return (
+        <ServiceContainer>
+          <Injecter1 />
+          <Injecter2 />
+        </ServiceContainer>
+      );
+    }
+    const { container, getByText } = render(<App />);
+
+    expect(fn1).toHaveBeenCalledTimes(1);
+    expect(fn2).toHaveBeenCalledTimes(1);
+    expect(getByText('visible1: no')).toBeTruthy();
+    expect(getByText('visible2: no')).toBeTruthy();
+
+    fireEvent.click(container.querySelector('button')!);
+    expect(fn1).toHaveBeenCalledTimes(2);
+    expect(fn2).toHaveBeenCalledTimes(2);
+    expect(getByText('visible1: yes')).toBeTruthy();
+    expect(getByText('visible2: yes')).toBeTruthy();
+
+    fireEvent.click(container.querySelector('button')!);
+    expect(fn1).toHaveBeenCalledTimes(3);
+    expect(fn2).toHaveBeenCalledTimes(3);
+    expect(getByText('visible1: no')).toBeTruthy();
+    expect(getByText('visible2: no')).toBeTruthy();
   });
 });

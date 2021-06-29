@@ -89,7 +89,7 @@ export function SignInPage() {
 
 ### Using the `Injectable` decorator
 
-By default, all classes decorated with `@Injectable` are automatically registered in the service container. The decorator receives two optional parameters: `token` and `scope`. If not specified, `token` will be the target class and `scope` will be `singleton`:
+By default, all classes decorated with `@Injectable` are automatically registered in the service container. The decorator receives two optional parameters: `provide` and `scope`. If not specified, `provide` will be the target class and `scope` will be `singleton`:
 
 ```ts
 @Injectable()
@@ -99,7 +99,7 @@ class HttpService {}
 is equivalent to:
 
 ```ts
-@Injectable(HttpService, 'singleton')
+@Injectable({ provide: HttpService, scope: 'singleton' })
 class HttpService {}
 ```
 
@@ -145,7 +145,7 @@ All forms of service registration are singleton-scoped by default. `useClass` an
 
 ### `useService` hook
 
-When registering services in the default way, you can obtain the service instance by simply doing:
+You can obtain the service instance by simply doing:
 
 ```ts
 const service = useService(SessionService);
@@ -172,7 +172,7 @@ const { fn } = useServiceSelector(SessionService, (service) => ({
 
 ## Stateful Services
 
-Stateful services are like normal services with the added functionality of being able to manage internal state and be compatible with reactivity. Let's modify our service and see how this works:
+Stateful services are like normal services with the added functionality of being able to manage internal state and trigger re-renders when necessary. Let's modify our service and see how this works:
 
 ```ts
 import { Injectable, Inject, StatefulService } from 'react-service-locator';
@@ -247,9 +247,9 @@ You can provide an alternative compare function as an optional third parameter, 
 
 ### Why one or the other?
 
-The main difference between `useService` and `useServiceSelector` is that the former will always return the entire service instance, while the latter will only return the exact result of its `selectorFn`. This means that with `useService` the `depsFn` can define a set of dependencies for re-renders while still giving you access to everything the service exposes. This can be good in some cases, but it can potentially lead to situations where in your component you access some state that you forget to add to the dependency list which could result in stale UI elements.
+The main difference between `useService` and `useServiceSelector` is that the former will always return the entire service instance, while the latter will only return the exact result of its `selectorFn` which can be anything. With `useService` the `depsFn` can define a set of dependencies for re-renders while still giving you access to everything the service exposes. This can be good in some cases, but it can potentially lead to situations where in your component you access some state that you forget to add to the dependency list which could result in stale UI elements.
 
-With `useServiceSelector` you are forced to add everything you need in your component to the `selectorFn` result, so it's easier to reason about.
+With `useServiceSelector` you are forced to add everything you need in your component to the `selectorFn` result, so there's less room for mistake.
 
 ## FAQ
 

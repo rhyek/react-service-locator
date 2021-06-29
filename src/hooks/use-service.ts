@@ -4,6 +4,7 @@ import { StatefulService } from '../stateful-service';
 import { IsStrictlyAny } from '../types/is-strictly-any';
 import { shallowCompare } from '../utils/shallow-compare';
 import { useGetService } from './use-get-service';
+import { useForceUpdate } from './use-force-update';
 
 export function useService<
   ExplicitProvider = any,
@@ -32,9 +33,7 @@ export function useService<
 ): Provider;
 export function useService(token: any, depsFn?: any): any {
   const service = useGetService(token);
-
-  // https://reactjs.org/docs/hooks-faq.html#is-there-something-like-forceupdate
-  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+  const forceUpdate = useForceUpdate();
 
   useEffect(() => {
     if (service instanceof StatefulService) {
