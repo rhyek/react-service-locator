@@ -7,12 +7,20 @@ interface StatefulServiceListener {
 export abstract class StatefulService<S, IS = Immutable<S>> {
   private listeners: StatefulServiceListener[] = [];
 
-  private _state: S;
+  /**
+   * The internal state. You should not need to update this directly since
+   * it will not trigger re-renders.
+   * It can be useful in constructors in some specific cases.
+   */
+  protected _state: S;
 
   constructor(initialState: S) {
     this._state = initialState;
   }
-
+  /**
+   * A getter for the internal state. It will return the same internal state
+   * object (=== is true), but typed as recursively immutable.
+   */
   public get state(): IS {
     return this._state as unknown as IS;
   }
