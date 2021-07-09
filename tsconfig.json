@@ -6,7 +6,6 @@
     "lib": ["dom", "esnext"],
     "declaration": true,
     "sourceMap": true,
-    "rootDir": "./src",
     "strict": true,
     "moduleResolution": "node",
     "jsx": "react",

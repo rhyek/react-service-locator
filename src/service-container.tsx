@@ -44,13 +44,16 @@ export const ServiceContainer: React.FC<ServiceLocatorProviderProps> = ({
       ? parentContainer.createChild()
       : createContainer();
     const finalServices = services.slice();
-    defaultServices.forEach(({ cls, scope }, token) => {
-      finalServices.unshift({
-        provide: token,
-        useClass: cls,
-        scope,
+    if (!parentContainer) {
+      // only automatically register decorated services on root service containers
+      defaultServices.forEach(({ cls, scope }, token) => {
+        finalServices.unshift({
+          provide: token,
+          useClass: cls,
+          scope,
+        });
       });
-    });
+    }
     const doneTokens: any[] = [];
     for (const provider of finalServices.reverse()) {
       let finalProvider: Exclude<Provider, Constructor>;

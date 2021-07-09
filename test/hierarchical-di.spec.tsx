@@ -71,4 +71,38 @@ describe('hierarchical di', () => {
     }
     render(<App />);
   });
+  it('decorated services are only automatically registered on root service containers', () => {
+    @Injectable()
+    class UserService {
+      name = () => 'default';
+    }
+
+    function Injecter() {
+      const service = useService(UserService);
+      const name = service.name();
+      return <div>hello, {name}</div>;
+    }
+
+    function App() {
+      return (
+        <ServiceContainer
+          services={[
+            {
+              provide: UserService,
+              useValue: {
+                name: () => 'override',
+              },
+            },
+          ]}
+        >
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        </ServiceContainer>
+      );
+    }
+
+    const { getByText } = render(<App />);
+    expect(getByText('hello, override')).toBeTruthy();
+  });
 });
