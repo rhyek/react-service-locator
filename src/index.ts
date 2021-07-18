@@ -1,4 +1,5 @@
 export { inject as Inject } from 'inversify';
+export { Service } from './decorators/service';
 export { Injectable } from './decorators/injectable';
 export { useService } from './hooks/use-service';
 export { useServiceSelector } from './hooks/use-service-selector';

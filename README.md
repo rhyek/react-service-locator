@@ -53,9 +53,9 @@ function App() {
 Define a service:
 
 ```ts
-import { Injectable, Inject } from 'react-service-locator';
+import { Service, Inject } from 'react-service-locator';
 
-@Injectable()
+@Service()
 export class SessionService {
   // Dependency injection is handled by Inversify internally
   @Inject(HttpService)
@@ -87,19 +87,19 @@ export function SignInPage() {
 
 ## Registering Services
 
-### Using the `Injectable` decorator
+### Using the `Service` decorator
 
-By default, all classes decorated with `@Injectable` are automatically registered in the service container. The decorator receives two optional parameters: `provide` and `scope`. If not specified, `provide` will be the target class and `scope` will be `singleton`:
+By default, all classes decorated with `@Service` are automatically registered in the service container. The decorator receives two optional parameters: `provide` and `scope`. If not specified, `provide` will be the target class and `scope` will be `singleton`:
 
 ```ts
-@Injectable()
+@Service()
 class HttpService {}
 ```
 
 is equivalent to:
 
 ```ts
-@Injectable({ provide: HttpService, scope: 'singleton' })
+@Service({ provide: HttpService, scope: 'singleton' })
 class HttpService {}
 ```
 
@@ -175,9 +175,9 @@ const { fn } = useServiceSelector(SessionService, (service) => ({
 Stateful services are like normal services with the added functionality of being able to manage internal state and trigger re-renders when necessary. Let's modify our service and see how this works:
 
 ```ts
-import { Injectable, Inject, StatefulService } from 'react-service-locator';
+import { Service, Inject, StatefulService } from 'react-service-locator';
 
-@Injectable()
+@Service()
 export class SessionService extends StatefulService<{
   displayName: string;
   idle: boolean;
@@ -186,8 +186,14 @@ export class SessionService extends StatefulService<{
   private readonly httpService;
 
   constructor() {
-    super(null); // initialize state
+    super(null); // initialize with super
   }
+
+  // Can also initialize this way.
+  // constructor() {
+  //   super();
+  //   this.state = null;
+  // }
 
   get upperCaseDisplayName() {
     return this.state?.displayName?.toUpperCase();

@@ -1,17 +1,12 @@
 import 'reflect-metadata';
 import React from 'react';
 import { cleanup, render, fireEvent } from '@testing-library/react';
-import {
-  Injectable,
-  ServiceContainer,
-  StatefulService,
-  useService,
-} from '../src';
+import { Service, ServiceContainer, StatefulService, useService } from '../src';
 
-@Injectable()
+@Service()
 class TheService {}
 
-@Injectable()
+@Service()
 class ProductService extends StatefulService<{ products: string[] }> {
   constructor() {
     super({ products: ['a'] });

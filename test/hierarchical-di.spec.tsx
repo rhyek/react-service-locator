@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import React from 'react';
 import { cleanup, render } from '@testing-library/react';
-import { Injectable, ServiceContainer, useService } from '../src';
+import { Service, ServiceContainer, useService } from '../src';
 
-@Injectable()
+@Service()
 class UserService {}
 
-@Injectable()
+@Service()
 class ProductService {}
 
 describe('hierarchical di', () => {
@@ -72,7 +72,7 @@ describe('hierarchical di', () => {
     render(<App />);
   });
   it('decorated services are only automatically registered on root service containers', () => {
-    @Injectable()
+    @Service()
     class UserService {
       name = () => 'default';
     }

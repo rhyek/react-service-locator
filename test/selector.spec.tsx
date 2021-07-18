@@ -2,19 +2,19 @@ import 'reflect-metadata';
 import React, { memo } from 'react';
 import { cleanup, render, fireEvent } from '@testing-library/react';
 import {
-  Injectable,
+  Service,
   ServiceContainer,
   StatefulService,
   useService,
   useServiceSelector,
 } from '../src';
 
-@Injectable()
+@Service()
 class SimpleService {
   hi = () => {};
 }
 
-@Injectable()
+@Service()
 class VisibilityService extends StatefulService<{ visible: boolean }> {
   constructor() {
     super({ visible: false });

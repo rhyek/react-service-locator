@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import React from 'react';
 import { cleanup, render } from '@testing-library/react';
-import { Injectable, ServiceContainer, useService } from '../src';
+import { Service, ServiceContainer, useService } from '../src';
 
-@Injectable()
+@Service()
 class UserService {}
 
 describe('service registration', () => {
@@ -12,7 +12,7 @@ describe('service registration', () => {
   });
 
   it('with service container', () => {
-    @Injectable()
+    @Service()
     class UserService {}
 
     function Injecter() {
@@ -31,7 +31,7 @@ describe('service registration', () => {
   });
 
   it('with decorator', () => {
-    @Injectable()
+    @Service()
     class UserService {}
 
     function Injecter() {
@@ -50,7 +50,7 @@ describe('service registration', () => {
   });
 
   it('with decorator specifying string token', () => {
-    @Injectable({ provide: 'token' })
+    @Service({ provide: 'token' })
     class UserService {}
 
     function Injecter() {
@@ -70,7 +70,7 @@ describe('service registration', () => {
   });
 
   it('with decorator specifying same class as token', () => {
-    @Injectable({ provide: UserService })
+    @Service({ provide: UserService })
     class UserService {}
 
     function Injecter() {
@@ -90,7 +90,7 @@ describe('service registration', () => {
   });
 
   it('can override a default service through service container', () => {
-    @Injectable()
+    @Service()
     class UserService {
       name = () => 'default';
     }
