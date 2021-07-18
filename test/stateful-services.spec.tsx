@@ -182,6 +182,37 @@ describe('stateful services', () => {
       fireEvent.click(container.querySelector('button')!);
       expect(getByText('value: 1'));
     });
+    it('throw if not initialized', () => {
+      @Service()
+      class SomeService extends StatefulService<{ value: number }> {
+        increment = () => {
+          this.setState({
+            value: this.state.value + 1,
+          });
+        };
+      }
+      function Injecter() {
+        const someService = useService(SomeService, (s) => [s.state.value]);
+        return (
+          <div>
+            value: {someService.state.value}
+            <button onClick={() => someService.increment()}>add</button>
+          </div>
+        );
+      }
+      function App() {
+        return (
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        );
+      }
+      const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() => render(<App />)).toThrowError(
+        'State has not been initialized.'
+      );
+      spy.mockRestore();
+    });
   });
   it('can do partial state updates', () => {
     type State = { a: number; b: number };
