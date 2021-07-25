@@ -1,7 +1,8 @@
 import { isPrimitive } from './is-primitive';
 import { shallowCompare } from './shallow-compare';
 
-export function autoCompare(a: any, b: any) {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export function autoCompare(a: any, b: any): boolean {
   if (typeof a !== typeof b) {
     return false;
   }

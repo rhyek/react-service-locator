@@ -1,4 +1,4 @@
-export function isPrimitive(v: any) {
+export function isPrimitive(v: any): boolean {
   // https://developer.mozilla.org/en-US/docs/Glossary/Primitive
   return (
     typeof v === 'string' ||

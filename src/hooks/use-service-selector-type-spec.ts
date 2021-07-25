@@ -1,11 +1,12 @@
+/* eslint-disable */
 import { expectTypeOf } from 'expect-type';
 import { useServiceSelector } from './use-service-selector';
 
 class RoleService {
-  name: string = 'ab';
+  name = 'ab';
 }
 class UserService {
-  age: number = 20;
+  age = 20;
 }
 
 // returns type of selector fn result if explicit type not specified

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { expectTypeOf } from 'expect-type';
 import { StatefulService } from '../stateful-service';
 import { Immutable } from '../types/immutable';
@@ -7,7 +8,7 @@ class RoleService {
   name: string | null = null;
 }
 class UserService {
-  age: number = 20;
+  age = 20;
 }
 type SaleServiceState = { a: number };
 class SaleService extends StatefulService<SaleServiceState> {}

@@ -1,6 +1,6 @@
 {
   "name": "react-service-locator",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "React implementation of the service locator pattern using Hooks, Context API, and Inversify",
   "author": {
     "name": "Carlos González",
@@ -30,8 +30,8 @@
     "dev": "tsdx watch",
     "build": "tsdx build --tsconfig ./tsconfig.build.json",
     "test:types": "tsc -p tsconfig.type-tests.json",
-    "test": "npm run test:types && tsdx test",
-    "lint": "tsdx lint",
+    "test": "npm run test:types && jest",
+    "lint": "eslint --max-warnings 0 --fix --ext .ts,.tsx src test",
     "prepare": "husky install && tsdx build"
   },
   "dependencies": {
@@ -46,9 +46,17 @@
     "@types/jest": "^26.0.24",
     "@types/react": "^17.0.6",
     "@types/react-dom": "^17.0.5",
+    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/parser": "^4.28.4",
+    "eslint": "^7.31.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "expect-type": "^0.11.0",
     "husky": "^6.0.0",
     "jest": "^27.0.6",
+    "prettier": "^2.3.2",
     "react": ">=16.13",
     "react-dom": ">=16.13",
     "reflect-metadata": "^0.1.13",

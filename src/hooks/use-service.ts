@@ -55,6 +55,7 @@ export function useService(token: any, depsFn?: any): any {
         service.removeListener(listener);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [service]);
 
   return service;

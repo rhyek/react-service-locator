@@ -1,3 +1,4 @@
+export { configure } from './config';
 export { inject as Inject } from 'inversify';
 export { Service } from './decorators/service';
 export { Injectable } from './decorators/injectable';

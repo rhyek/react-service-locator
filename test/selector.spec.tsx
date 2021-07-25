@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import 'reflect-metadata';
 import React, { memo } from 'react';
 import { cleanup, render, fireEvent } from '@testing-library/react';

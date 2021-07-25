@@ -4,7 +4,7 @@ function shallowCompareArray<T extends Array<any>>(a: T, b: T) {
   return a.length === b.length && a.every((v, i) => Object.is(v, b[i]));
 }
 
-export function shallowCompare<T>(a: T, b: T) {
+export function shallowCompare<T>(a: T, b: T): boolean {
   if (typeof a !== typeof b || isPrimitive(a) || isPrimitive(b)) {
     return false;
   }

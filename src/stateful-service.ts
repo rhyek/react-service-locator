@@ -17,7 +17,9 @@ export abstract class StatefulService<S, IS = Immutable<S>> {
     }
   }
 
-  private assertIsInitialized<T extends any>(d: T): asserts d is Exclude<T, typeof notInitialized> {
+  private assertIsInitialized<T extends any>(
+    d: T
+  ): asserts d is Exclude<T, typeof notInitialized> {
     if (d === notInitialized) {
       throw new Error('State has not been initialized.');
     }

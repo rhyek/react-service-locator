@@ -42,6 +42,7 @@ export function useServiceSelector<
         service.removeListener(listener);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [service]);
 
   return lastValueRef.current;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import 'reflect-metadata';
 import React, { useEffect, useRef } from 'react';
 import { cleanup, render, fireEvent } from '@testing-library/react';
@@ -232,7 +233,7 @@ describe('stateful services', () => {
       const runRef = useRef<number>(0);
       useEffect(() => {
         service.update({ b: 3 });
-      }, []);
+      }, [service]);
       runRef.current++;
       if (runRef.current === 1) {
         expect(service.state).toEqual({ a: 1, b: 2 });
