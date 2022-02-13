@@ -252,4 +252,176 @@ describe('stateful services', () => {
     render(<App />);
     expect(fn).toHaveBeenCalledTimes(2);
   });
+
+  describe('types of state', () => {
+    it('object', () => {
+      @Service()
+      class TestService extends StatefulService<{ value: number }> {
+        constructor() {
+          super();
+          this.state = { value: 1 };
+        }
+        increment = () => {
+          this.setState({ value: this.state.value + 1 });
+        };
+      }
+      let service: TestService;
+      function Injecter() {
+        service = useService(TestService);
+        return <button onClick={() => service.increment()}>add</button>;
+      }
+      function App() {
+        return (
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        );
+      }
+      const { container } = render(<App />);
+      fireEvent.click(container.querySelector('button')!);
+      expect(service!.state).toEqual({ value: 2 });
+    });
+    it('number', () => {
+      @Service()
+      class TestService extends StatefulService<number> {
+        constructor() {
+          super();
+          this.state = 1;
+        }
+        increment = () => {
+          this.setState(this.state + 1);
+        };
+      }
+      let service: TestService;
+      function Injecter() {
+        service = useService(TestService);
+        return <button onClick={() => service.increment()}>add</button>;
+      }
+      function App() {
+        return (
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        );
+      }
+      const { container } = render(<App />);
+      fireEvent.click(container.querySelector('button')!);
+      expect(service!.state).toEqual(2);
+    });
+    it('boolean', () => {
+      @Service()
+      class TestService extends StatefulService<boolean> {
+        constructor() {
+          super();
+          this.state = false;
+        }
+        update = () => {
+          this.setState(!this.state);
+        };
+      }
+      let service: TestService;
+      function Injecter() {
+        service = useService(TestService);
+        return <button onClick={() => service.update()}>add</button>;
+      }
+      function App() {
+        return (
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        );
+      }
+      const { container } = render(<App />);
+      fireEvent.click(container.querySelector('button')!);
+      expect(service!.state).toEqual(true);
+    });
+    it('string', () => {
+      @Service()
+      class TestService extends StatefulService<string> {
+        constructor() {
+          super();
+          this.state = 'hello, world!';
+        }
+        update = () => {
+          this.setState(this.state.toUpperCase());
+        };
+      }
+      let service: TestService;
+      function Injecter() {
+        service = useService(TestService);
+        return <button onClick={() => service.update()}>add</button>;
+      }
+      function App() {
+        return (
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        );
+      }
+      const { container } = render(<App />);
+      fireEvent.click(container.querySelector('button')!);
+      expect(service!.state).toEqual('HELLO, WORLD!');
+    });
+    it('date', () => {
+      const initialDate = new Date();
+      @Service()
+      class TestService extends StatefulService<Date> {
+        constructor() {
+          super();
+          this.state = initialDate;
+        }
+        update = () => {
+          const nextDate = new Date(this.state.getTime() + 1_000);
+          this.setState(nextDate);
+        };
+      }
+      let service: TestService;
+      function Injecter() {
+        service = useService(TestService);
+        return <button onClick={() => service.update()}>add</button>;
+      }
+      function App() {
+        return (
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        );
+      }
+      const { container } = render(<App />);
+      fireEvent.click(container.querySelector('button')!);
+      expect(service!.state.getTime()).toEqual(initialDate.getTime() + 1_000);
+    });
+    it('array', () => {
+      @Service()
+      class TestService extends StatefulService<string[]> {
+        constructor() {
+          super();
+          this.state = ['a', 'b', 'c'];
+        }
+        update = () => {
+          this.setState([
+            ...this.state,
+            String.fromCharCode(97 + this.state.length),
+          ]);
+        };
+      }
+      let service: TestService;
+      function Injecter() {
+        service = useService(TestService);
+        return <button onClick={() => service.update()}>add</button>;
+      }
+      function App() {
+        return (
+          <ServiceContainer>
+            <Injecter />
+          </ServiceContainer>
+        );
+      }
+      const { container } = render(<App />);
+      fireEvent.click(container.querySelector('button')!);
+      expect(Array.isArray(service!.state)).toEqual(true);
+      expect(service!.state.length).toEqual(4);
+      expect(service!.state[3]).toEqual('d');
+    });
+  });
 });

@@ -1,3 +1,4 @@
+import { isPlainObject } from 'is-what';
 import { Immutable } from './types/immutable';
 
 interface StatefulServiceListener {
@@ -35,15 +36,21 @@ export abstract class StatefulService<S, IS = Immutable<S>> {
   }
 
   /**
-   * Set state without triggering re-renders. Should only be used in constructors.
+   * Can be used to set state without triggering re-renders.
+   * Should only be used in constructors this way.
    */
   protected set state(state: S | IS) {
     this._state = state as S;
   }
 
-  protected setState(newState: Partial<S>): void {
+  protected setState(newState: S | Partial<S>): void {
     this.assertIsInitialized(this._state);
-    this._state = { ...this._state, ...newState };
+
+    if (isPlainObject(this._state) && isPlainObject(newState)) {
+      this._state = { ...this._state, ...newState };
+    } else {
+      this._state = newState as S;
+    }
     for (const listener of this.listeners) {
       listener();
     }
