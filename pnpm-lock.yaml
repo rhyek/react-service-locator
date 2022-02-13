@@ -17,8 +17,8 @@ specifiers:
   eslint-plugin-react-hooks: ^4.2.0
   expect-type: ^0.11.0
   husky: ^6.0.0
-  inversify: ^5.1.1
-  is-what: ^4.1.7
+  inversify: 6.0.1
+  is-what: 4.1.7
   jest: ^27.0.6
   prettier: ^2.3.2
   react: '>=16.13'
@@ -30,7 +30,7 @@ specifiers:
   typescript: ^4.3.0
 
 dependencies:
-  inversify: 5.1.1
+  inversify: 6.0.1
   is-what: 4.1.7
 
 devDependencies:
@@ -4851,8 +4851,8 @@ packages:
     engines: {node: '>= 0.10'}
     dev: true
 
-  /inversify/5.1.1:
-    resolution: {integrity: sha512-j8grHGDzv1v+8T1sAQ+3boTCntFPfvxLCkNcxB1J8qA0lUN+fAlSyYd+RXKvaPRL4AGyPxViutBEJHNXOyUdFQ==}
+  /inversify/6.0.1:
+    resolution: {integrity: sha512-B3ex30927698TJENHR++8FfEaJGqoWOgI6ZY5Ht/nLUsFCwHn6akbwtnUAPCgUepAnTpe2qHxhDNjoKLyz6rgQ==}
     dev: false
 
   /ip-regex/2.1.0:

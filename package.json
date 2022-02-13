@@ -1,6 +1,6 @@
 {
   "name": "react-service-locator",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "React implementation of the service locator pattern using Hooks, Context API, and Inversify",
   "author": {
     "name": "Carlos González",
@@ -35,8 +35,8 @@
     "prepare": "husky install && tsdx build"
   },
   "dependencies": {
-    "inversify": "^5.1.1",
-    "is-what": "^4.1.7"
+    "inversify": "6.0.1",
+    "is-what": "4.1.7"
   },
   "peerDependencies": {
     "react": ">=16.13 || >=17",
