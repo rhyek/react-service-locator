@@ -18,7 +18,7 @@ export const Service: (options?: ServiceOptions) => ClassDecorator = (
     if (typeof provide === 'undefined') {
       provide = constructor;
     }
-    injectable()(constructor);
+    injectable()(constructor as new (args: never) => unknown);
     registerDefaultService(provide, { cls: constructor as Constructor, scope });
   };
 };
